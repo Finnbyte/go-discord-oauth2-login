@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Discord Auth with Go</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        } 
+        </style>
+    </head>
+    <body>
+        <div>
+            {{if not .UserId}}
+                <h1>LOGIN NOW!!!</h1>
+                <button onclick="window.location.replace('https://discord.com/oauth2/authorize?client_id=1215381408772788234&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fapi%2Flogin&scope=identify')">Login</button>
+            {{else}}
+                <p>Welcome, <strong>{{.Username}}</strong>!</p> 
+            {{end}}
+        </div>
+
+    </body>
+</html>
