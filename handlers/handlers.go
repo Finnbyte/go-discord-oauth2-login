@@ -38,20 +38,27 @@ func HandleAPILogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, discordLoginUrl, http.StatusSeeOther)
 }
 
+func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
-	if oauthCode := queryParams.Get("code"); oauthCode != "" {
-		accessToken, refreshToken, err := discordapi.RequestToken(oauthCode)
-		if err != nil {
-			// TODO Handle Discord refusing authorization
-			panic(err)
-		}
+	code := queryParams.Get("code")
 
-		refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: refreshToken, HttpOnly: true, Path: "/"}
-		http.SetCookie(w, &refreshTokenCookie)
-
-		accessTokenCookie := http.Cookie{Name: "AccessToken", Value: accessToken, HttpOnly: true, Path: "/"}
-		http.SetCookie(w, &accessTokenCookie)
+	if code == "" {
+		fmt.Fprint(w, "Code was empty")
+		return
 	}
 
-	http.Redirect(w, r, "http://127.0.0.1"+config.GetOption("port"), http.StatusFound)
+	accessToken, refreshToken, err := discordapi.RequestToken(code)
+	if err != nil {
+		fmt.Fprint(w, "Token were not given. Reason: %s", err.Error())
+		return
+	}
+
+	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: accessToken, HttpOnly: true, Path: "/"}
+	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: refreshToken, HttpOnly: true, Path: "/"}
+
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * 5)
+	cookie.SetWithExpiration(w, refreshTokenCookie, time.Second * 5)
+
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
+
