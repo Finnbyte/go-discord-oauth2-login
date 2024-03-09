@@ -57,7 +57,7 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
-func HandleAPIRefreshTokenRefresh(w http.ResponseWriter, r *http.Request) {
+func HandleAPIAccessTokenRefresh(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("refresh handler")
 	refreshTokenCookie, err := r.Cookie("RefreshToken")
 	if err != nil {
