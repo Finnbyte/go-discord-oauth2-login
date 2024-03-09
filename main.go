@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/api/login/callback", handlers.HandleAPILoginCallback)
 	http.HandleFunc("/api/logout", handlers.HandleAPILogout)
 
+	log.Printf("Server starting in :%s...\n", config.GetOption("port"))
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.GetOption("port")), nil); err != nil {
         log.Fatalln(err)
     }
