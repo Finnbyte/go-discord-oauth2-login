@@ -21,14 +21,14 @@
             <figure class="image is-64x64">
                 <img class="is-rounded" src="https://cdn.discordapp.com/avatars/{{.UserId}}/{{.Avatar}}.png">
             </figure>
-            <form action="/api/logout">
-                <button type="submit">Logout</button>
-            </form>
+            <a href="./api/logout">
+                <button>Logout</button>
+            </a>
             {{else}}
             <h1>LOGIN NOW!!!</h1>
-            <form action="/api/login">
-                <button type="submit">Login</button>
-            </form>
+            <a href="./api/login">
+                <button>Login</button>
+            </a>
             {{end}}
         </div>
 
