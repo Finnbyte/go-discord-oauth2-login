@@ -44,7 +44,7 @@ func GetOwnDiscordIdentity(accessToken string) (DiscordIdentity, error) {
 
 func RequestToken(oauthCode string) (accessToken, refreshToken string, err error) {
     const url = discordApiUrl + "/oauth2/token"
-    var redirectUri = fmt.Sprintf("http://127.0.0.1:%s/api/login", config.GetOption("port"))
+    var redirectUri = fmt.Sprintf("http://127.0.0.1:%s/api/login/callback", config.GetOption("port"))
 
     payload := URL.Values{}
     payload.Set("client_id", config.GetOption("clientId"))
