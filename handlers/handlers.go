@@ -56,8 +56,8 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: accessToken, HttpOnly: true, Path: "/"}
 	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: refreshToken, HttpOnly: true, Path: "/"}
 
-	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * 5)
-	cookie.SetWithExpiration(w, refreshTokenCookie, time.Second * 5)
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Minute * 30)
+	cookie.SetWithExpiration(w, refreshTokenCookie, time.Minute * 30)
 
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
