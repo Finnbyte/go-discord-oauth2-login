@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+func IsUnexpired(cookie *http.Cookie) bool {
+	if cookie.Expires.After(time.Now()) {
+		return false
+	}
+
+	return true
+}
 
 func SetWithExpiration(w http.ResponseWriter, cookie http.Cookie, duration time.Duration) {
 	cookie.Expires = time.Now().Add(duration)
