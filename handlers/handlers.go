@@ -21,12 +21,13 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := templates.RenderByFilename(w, "index.html", userData); err != nil {
+	if err := templates.Get().ExecuteTemplate(w, "index.html", userData); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func HandleLoginFail(w http.ResponseWriter, r *http.Request) {
-	if err := templates.RenderByFilename(w, "login_fail.html", nil); err != nil {
+	if err := templates.Get().ExecuteTemplate(w, "login_fail.html", nil); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

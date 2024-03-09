@@ -2,25 +2,34 @@ package templates
 
 import (
 	"html/template"
-	"net/http"
+	"strings"
+	"fmt"
+	"os"
 	"path/filepath"
 )
 
-func RenderByFilename(w http.ResponseWriter, filename string, data any) error {
-	absolutePath, err := filepath.Abs("./templates/" + filename)
-	if err != nil {
+func processTemplates() *template.Template {
+	t := template.New("")
+	err := filepath.Walk("./templates", func(path string, info os.FileInfo, err error) error {
+		if strings.Contains(path, ".html") {
+			fmt.Println(path)
+			_, err = t.ParseFiles(path)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 		return err
-	}
+	})
 
-	tmpl, err := template.ParseFiles(absolutePath)
-	if err != nil {
-		return err
-	}
-
-	err = tmpl.Execute(w, data)
-	if err != nil {
-		return err
-	}
-
-	return nil
+    if err != nil {
+        panic(err)
+    }
+    return t
 }
+
+var templates = processTemplates()
+
+func Get() *template.Template {
+	return templates
+}
+
