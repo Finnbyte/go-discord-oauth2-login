@@ -16,22 +16,9 @@
         </style>
     </head>
     <body>
-        <div>
-            {{if .UserId}}
-            <p>Welcome, <strong>{{.Username}}</strong>!</p> 
-            <figure class="image is-64x64">
-                <img class="is-rounded" src="https://cdn.discordapp.com/avatars/{{.UserId}}/{{.Avatar}}.png">
-            </figure>
-            <a href="./api/logout">
-                <button>Logout</button>
-            </a>
-            {{else}}
-            <h1>LOGIN NOW!!!</h1>
-            <a href="./api/login">
-                <button>Login</button>
-            </a>
-            {{end}}
-        </div>
-
+        {{template "navbar" .}}
+        <main>
+            <h1>Content</h1>
+        </main>
     </body>
 </html>
