@@ -22,6 +22,7 @@ func main() {
 
     http.HandleFunc("/", handlers.HandleIndex)
 	http.HandleFunc("/api/login", handlers.HandleAPILogin)
+	http.HandleFunc("/api/login/callback", handlers.HandleAPILoginCallback)
 	http.HandleFunc("/api/logout", handlers.HandleAPILogout)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.GetOption("port")), nil); err != nil {
