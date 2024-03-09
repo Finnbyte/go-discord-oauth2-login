@@ -33,6 +33,11 @@ func HandleLoginFail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HandleAPILogin(w http.ResponseWriter, r *http.Request) {
+	const discordLoginUrl = "https://discord.com/oauth2/authorize?client_id=1215381408772788234&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fapi%2Flogin%2Fcallback&scope=identify"
+	http.Redirect(w, r, discordLoginUrl, http.StatusSeeOther)
+}
+
 	queryParams := r.URL.Query()
 	if oauthCode := queryParams.Get("code"); oauthCode != "" {
 		accessToken, refreshToken, err := discordapi.RequestToken(oauthCode)
