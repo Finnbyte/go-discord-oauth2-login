@@ -62,3 +62,23 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
+func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
+	accessTokenCookie, err := r.Cookie("AccessToken")
+	if err != nil {
+		http.Redirect(w, r, "http://127.0.0.1:"+config.GetOption("port"), http.StatusMovedPermanently)
+		return;
+	}
+
+	err = discordapi.RevokeTokens(accessTokenCookie.Value)
+	if err != nil {
+		panic(err)
+	}
+
+	// Make both cookies invalid so new ones will be retrieved when needed
+	refreshTokenCookie, _ := r.Cookie("RefreshToken")
+	cookie.Clear(w, accessTokenCookie)
+	cookie.Clear(w, refreshTokenCookie)
+	
+	http.Redirect(w, r, "http://127.0.0.1:"+config.GetOption("port"), http.StatusSeeOther)
+}
+
