@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <script src="https://kit.fontawesome.com/0a9fdf6fd4.js" crossorigin="anonymous"></script>
         <style>
         body {
             display: flex;
@@ -15,22 +16,9 @@
         </style>
     </head>
     <body>
-        <div>
-            {{if .UserId}}
-            <p>Welcome, <strong>{{.Username}}</strong>!</p> 
-            <figure class="image is-64x64">
-                <img class="is-rounded" src="https://cdn.discordapp.com/avatars/{{.UserId}}/{{.Avatar}}.png">
-            </figure>
-            <a href="./api/logout">
-                <button>Logout</button>
-            </a>
-            {{else}}
-            <h1>LOGIN NOW!!!</h1>
-            <a href="./api/login">
-                <button>Login</button>
-            </a>
-            {{end}}
-        </div>
-
+        {{template "navbar" .}}
+        <main>
+            <h1>Content</h1>
+        </main>
     </body>
 </html>

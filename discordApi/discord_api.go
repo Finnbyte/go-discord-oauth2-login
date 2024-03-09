@@ -14,35 +14,15 @@ const discordApiUrl = "https://discord.com/api"
 func GetOwnDiscordIdentity(accessToken string) (DiscordIdentity, error) {
     const url = discordApiUrl + "/users/@me"
 
-    req, _ := http.NewRequest(http.MethodGet, url, nil)
-    req.Header.Add("Authorization", "Bearer " + accessToken)
+	payload, err := SendAuthenticatedRequest[DiscordIdentity](http.MethodGet, url, accessToken, nil)
+	if err != nil {
+		return DiscordIdentity{}, err
+	}
 
-    res, err := http.DefaultClient.Do(req)
-    if err != nil {
-        return DiscordIdentity{}, err
-    }
-
-    if !isOk(res.StatusCode) {
-        return DiscordIdentity{}, &ApiError{code: res.StatusCode, msg: res.Status}
-    }
-
-    var discordIdentity DiscordIdentity
-
-    bodyBytes, err := io.ReadAll(res.Body)
-    if err != nil {
-        return DiscordIdentity{}, err
-    }
-
-    fmt.Println(string(bodyBytes))
-
-    if err = json.Unmarshal(bodyBytes, &discordIdentity); err != nil {
-        return DiscordIdentity{}, err
-    }
-
-    return discordIdentity, nil
+    return payload, nil
 }
 
-func RequestToken(oauthCode string) (accessToken, refreshToken string, err error) {
+func RequestToken(oauthCode string) (SuccesfulAuthenticationPayload, error) {
     const url = discordApiUrl + "/oauth2/token"
     var redirectUri = fmt.Sprintf("http://127.0.0.1:%s/api/login/callback", config.GetOption("port"))
 
@@ -55,24 +35,21 @@ func RequestToken(oauthCode string) (accessToken, refreshToken string, err error
 
     res, err := http.PostForm(url, payload)
     if err != nil {
-       return "", "", err 
+       return SuccesfulAuthenticationPayload{}, err 
     }
 
     if !isOk(res.StatusCode) {
-        return "", "", &ApiError{code: res.StatusCode, msg: res.Status}
+        return SuccesfulAuthenticationPayload{}, &ApiError{code: res.StatusCode, msg: res.Status}
     }
 
-    // Body always has to be closed
+	var authPayload SuccesfulAuthenticationPayload
+
     defer res.Body.Close()
 
-    var succesfulAuth SuccesfulAuthentication
-
     bodyBytes, _ := io.ReadAll(res.Body)
-    json.Unmarshal(bodyBytes, &succesfulAuth)
+    json.Unmarshal(bodyBytes, &authPayload)
 
-    accessToken = succesfulAuth.AccessToken
-    refreshToken = succesfulAuth.RefreshToken
-    return
+    return authPayload, nil
 }
 
 func RevokeTokens(accessToken string) error {
@@ -98,7 +75,7 @@ func RevokeTokens(accessToken string) error {
 	return nil
 }
 
-func RefreshAccessToken(refreshToken string) (accessToken string, err error) {
+func RefreshAccessToken(refreshToken string) (SuccesfulAuthenticationPayload, error) {
     const url = discordApiUrl + "/oauth2/token"
 
     payload := URL.Values{}
@@ -109,21 +86,19 @@ func RefreshAccessToken(refreshToken string) (accessToken string, err error) {
     
     res, err := http.PostForm(url, payload)
     if err != nil {
-       return "", err 
+       return SuccesfulAuthenticationPayload{}, err 
     }
 
-    if !isOk(res.StatusCode) {
-        return "", &ApiError{code: res.StatusCode, msg: res.Status}
-    }
+	if !isOk(res.StatusCode) {
+		return SuccesfulAuthenticationPayload{}, &ApiError{code: res.StatusCode, msg: res.Status}
+	}
 
-    // Body always has to be closed
+	var authPayload SuccesfulAuthenticationPayload
+
     defer res.Body.Close()
-
-    var succesfulAuth SuccesfulAuthentication
-
     bodyBytes, _ := io.ReadAll(res.Body)
-    json.Unmarshal(bodyBytes, &succesfulAuth)
+    json.Unmarshal(bodyBytes, &authPayload)
 
-    accessToken = succesfulAuth.AccessToken
-    return
+    return authPayload, nil
 }
+

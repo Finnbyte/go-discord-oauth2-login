@@ -10,23 +10,21 @@ import (
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	var userData discordapi.DiscordIdentity
-
-	if accessToken, err := r.Cookie("AccessToken"); err == nil {
-		// TODO Handle outdated access token
-		newUserData, err := discordapi.GetOwnDiscordIdentity(accessToken.Value)
-		if err == nil {
-			userData = newUserData
-		}
+	maybeAccessTokenCookie := cookie.TryGetValidCookie(r, "AccessToken")
+	if maybeAccessTokenCookie == nil {
+		fmt.Println("no access token")
+		http.Redirect(w, r, "/api/login/refresh", http.StatusSeeOther)
+		return
 	}
 
 	if err := templates.RenderByFilename(w, "index.html", userData); err != nil {
+	if err := templates.Get().ExecuteTemplate(w, "index.html", userData); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func HandleLoginFail(w http.ResponseWriter, r *http.Request) {
-	if err := templates.RenderByFilename(w, "login_fail.html", nil); err != nil {
+	if err := templates.Get().ExecuteTemplate(w, "login_fail.html", nil); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -45,19 +43,36 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken, err := discordapi.RequestToken(code)
+	payload, err := discordapi.RequestToken(code)
 	if err != nil {
-		fmt.Fprint(w, "Token were not given. Reason: %s", err.Error())
+		fmt.Fprintf(w, "Token were not given. Reason: %s", err.Error())
 		return
 	}
 
-	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: accessToken, HttpOnly: true, Path: "/"}
-	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: refreshToken, HttpOnly: true, Path: "/"}
+	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, HttpOnly: true, Path: "/"}
+	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: payload.RefreshToken, HttpOnly: true, Path: "/"}
 
-	cookie.SetWithExpiration(w, accessTokenCookie, time.Minute * 30)
-	cookie.SetWithExpiration(w, refreshTokenCookie, time.Minute * 30)
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	cookie.SetWithExpiration(w, refreshTokenCookie, time.Hour * 24 * 30) // 1 month
 
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+}
+
+func HandleAPIAccessTokenRefresh(w http.ResponseWriter, r *http.Request) {
+	refreshTokenCookie, err := r.Cookie("RefreshToken")
+	if err != nil {
+		fmt.Fprintln(w, "TODO: Handle no refresh token")
+	}
+
+	payload, _ := discordapi.RefreshAccessToken(refreshTokenCookie.Value)
+
+	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, Path: "/", HttpOnly: true}
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	// Refresh refresh token expiration
+	cookie.SetWithExpiration(w, *refreshTokenCookie, time.Hour * 24 * 30) // 1 month
+
+	whereCameFromURL := r.URL.Path
+	http.Redirect(w, r, whereCameFromURL, http.StatusSeeOther)
 }
 
 func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
