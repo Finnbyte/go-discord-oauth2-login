@@ -15,15 +15,15 @@
     </head>
     <body>
         <div>
-            {{if not .UserId}}
-            <h1>LOGIN NOW!!!</h1>
-            <form action="/api/login">
-                <button type="submit">Login</button>
-            </form>
-            {{else}}
+            {{if .UserId}}
             <p>Welcome, <strong>{{.Username}}</strong>!</p> 
             <form action="/api/logout">
                 <button type="submit">Logout</button>
+            </form>
+            {{else}}
+            <h1>LOGIN NOW!!!</h1>
+            <form action="/api/login">
+                <button type="submit">Login</button>
             </form>
             {{end}}
         </div>
