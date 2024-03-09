@@ -58,7 +58,6 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleAPIAccessTokenRefresh(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("refresh handler")
 	refreshTokenCookie, err := r.Cookie("RefreshToken")
 	if err != nil {
 		fmt.Fprintln(w, "TODO: Handle no refresh token")
