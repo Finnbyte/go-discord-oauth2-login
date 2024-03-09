@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"GoDiscordAuth/config"
 	"GoDiscordAuth/cookie"
 	"GoDiscordAuth/discordApi"
 	"GoDiscordAuth/templates"
@@ -65,7 +64,7 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie, err := r.Cookie("AccessToken")
 	if err != nil {
-		http.Redirect(w, r, "http://127.0.0.1:"+config.GetOption("port"), http.StatusMovedPermanently)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return;
 	}
 
@@ -79,6 +78,6 @@ func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
 	cookie.Clear(w, accessTokenCookie)
 	cookie.Clear(w, refreshTokenCookie)
 	
-	http.Redirect(w, r, "http://127.0.0.1:"+config.GetOption("port"), http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }
 
