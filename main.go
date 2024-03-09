@@ -21,7 +21,7 @@ func main() {
 	config.SetOption("port", os.Getenv("PORT"))
 
     http.HandleFunc("/", handlers.HandleIndex)
-	http.HandleFunc("/api/login", handlers.HandleLogin)
+	http.HandleFunc("/api/login", handlers.HandleAPILogin)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", config.GetOption("port")), nil); err != nil {
         log.Fatalln(err)
