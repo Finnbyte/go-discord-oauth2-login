@@ -16,10 +16,15 @@
     <body>
         <div>
             {{if not .UserId}}
-                <h1>LOGIN NOW!!!</h1>
-                <button onclick="window.location.replace('https://discord.com/oauth2/authorize?client_id=1215381408772788234&response_type=code&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fapi%2Flogin&scope=identify')">Login</button>
+            <h1>LOGIN NOW!!!</h1>
+            <form action="/api/login">
+                <button type="submit">Login</button>
+            </form>
             {{else}}
-                <p>Welcome, <strong>{{.Username}}</strong>!</p> 
+            <p>Welcome, <strong>{{.Username}}</strong>!</p> 
+            <form action="/api/logout">
+                <button type="submit">Logout</button>
+            </form>
             {{end}}
         </div>
 
