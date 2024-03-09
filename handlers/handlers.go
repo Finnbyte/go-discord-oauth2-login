@@ -27,7 +27,12 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleLogin(w http.ResponseWriter, r *http.Request) {
+func HandleLoginFail(w http.ResponseWriter, r *http.Request) {
+	if err := templates.RenderByFilename(w, "login_fail.html", nil); err != nil {
+		log.Fatalln(err)
+	}
+}
+
 	queryParams := r.URL.Query()
 	if oauthCode := queryParams.Get("code"); oauthCode != "" {
 		accessToken, refreshToken, err := discordapi.RequestToken(oauthCode)
