@@ -75,6 +75,29 @@ func RequestToken(oauthCode string) (accessToken, refreshToken string, err error
     return
 }
 
+func RevokeTokens(accessToken string) error {
+	const url = discordApiUrl + "/oauth2/token/revoke"
+
+	payload := URL.Values{}
+    payload.Set("client_id", config.GetOption("clientId"))
+    payload.Set("client_secret", config.GetOption("clientSecret"))
+	payload.Set("token", accessToken)
+	payload.Set("token_type_hint", "access_token")
+
+	res, err := http.PostForm(url, payload)
+	if err != nil {
+		return err
+	}
+
+	if !isOk(res.StatusCode) {
+		bodyBytes, _ := io.ReadAll(res.Body)
+		fmt.Println(string(bodyBytes))
+		return &ApiError{msg: res.Status, code: res.StatusCode}
+	}
+
+	return nil
+}
+
 func RefreshAccessToken(refreshToken string) (accessToken string, err error) {
     const url = discordApiUrl + "/oauth2/token"
 
