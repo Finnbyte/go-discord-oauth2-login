@@ -5,7 +5,6 @@ import (
 	"GoDiscordAuth/discordApi"
 	"GoDiscordAuth/templates"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -22,13 +21,13 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := templates.RenderByFilename(w, "index.html", userData); err != nil {
-		log.Fatalln(err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func HandleLoginFail(w http.ResponseWriter, r *http.Request) {
 	if err := templates.RenderByFilename(w, "login_fail.html", nil); err != nil {
-		log.Fatalln(err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
