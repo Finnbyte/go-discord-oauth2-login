@@ -60,6 +60,24 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
+func HandleAPIRefreshTokenRefresh(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("refresh handler")
+	refreshTokenCookie, err := r.Cookie("RefreshToken")
+	if err != nil {
+		fmt.Fprintln(w, "TODO: Handle no refresh token")
+	}
+
+	payload, _ := discordapi.RefreshAccessToken(refreshTokenCookie.Value)
+
+	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, Path: "/", HttpOnly: true}
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	// Refresh refresh token expiration
+	cookie.SetWithExpiration(w, *refreshTokenCookie, time.Hour * 24 * 30) // 1 month
+
+	whereCameFromURL := r.URL.Path
+	http.Redirect(w, r, whereCameFromURL, http.StatusSeeOther)
+}
+
 func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie, err := r.Cookie("AccessToken")
 	if err != nil {
