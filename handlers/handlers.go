@@ -11,11 +11,10 @@ import (
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	var userData discordapi.DiscordIdentity
 
-	accessToken, err := r.Cookie("AccessToken")
-	if err == nil {
+	if accessToken, err := r.Cookie("AccessToken"); err == nil {
+		// TODO Handle outdated access token
 		newUserData, err := discordapi.GetOwnDiscordIdentity(accessToken.Value)
 		if err == nil {
-			// TODO Handle outdated access token
 			userData = newUserData
 		}
 	}
