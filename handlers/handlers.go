@@ -2,10 +2,13 @@ package handlers
 
 import (
 	"GoDiscordAuth/config"
-	discordapi "GoDiscordAuth/discordApi"
+	"GoDiscordAuth/cookie"
+	"GoDiscordAuth/discordApi"
 	"GoDiscordAuth/templates"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
