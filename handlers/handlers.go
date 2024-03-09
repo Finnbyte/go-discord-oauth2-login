@@ -10,14 +10,11 @@ import (
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	var userData discordapi.DiscordIdentity
-
-	if accessToken, err := r.Cookie("AccessToken"); err == nil {
-		// TODO Handle outdated access token
-		newUserData, err := discordapi.GetOwnDiscordIdentity(accessToken.Value)
-		if err == nil {
-			userData = newUserData
-		}
+	maybeAccessTokenCookie := cookie.TryGetValidCookie(r, "AccessToken")
+	if maybeAccessTokenCookie == nil {
+		fmt.Println("no access token")
+		http.Redirect(w, r, "/api/login/refresh", http.StatusSeeOther)
+		return
 	}
 
 	if err := templates.RenderByFilename(w, "index.html", userData); err != nil {
