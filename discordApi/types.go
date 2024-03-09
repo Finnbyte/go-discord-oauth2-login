@@ -7,9 +7,10 @@ type DiscordIdentity struct {
     Avatar string `json:"avatar"`
 }
 
-type SuccesfulAuthentication struct {
+type SuccesfulAuthenticationPayload struct {
     AccessToken string `json:"access_token"`
     RefreshToken string `json:"refresh_token"`
+    ExpiresIn int `json:"expires_in"`
 }
 
 type ApiError struct {
