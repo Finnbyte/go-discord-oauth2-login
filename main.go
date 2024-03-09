@@ -21,6 +21,7 @@ func main() {
 	config.SetOption("port", os.Getenv("PORT"))
 
     http.HandleFunc("/", handlers.HandleIndex)
+    http.HandleFunc("/login-fail", handlers.HandleLoginFail)
 	http.HandleFunc("/api/login", handlers.HandleAPILogin)
 	http.HandleFunc("/api/login/callback", handlers.HandleAPILoginCallback)
 	http.HandleFunc("/api/logout", handlers.HandleAPILogout)
