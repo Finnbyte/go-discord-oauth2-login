@@ -45,17 +45,17 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken, err := discordapi.RequestToken(code)
+	payload, err := discordapi.RequestToken(code)
 	if err != nil {
-		fmt.Fprint(w, "Token were not given. Reason: %s", err.Error())
+		fmt.Fprintf(w, "Token were not given. Reason: %s", err.Error())
 		return
 	}
 
-	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: accessToken, HttpOnly: true, Path: "/"}
-	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: refreshToken, HttpOnly: true, Path: "/"}
+	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, HttpOnly: true, Path: "/"}
+	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: payload.RefreshToken, HttpOnly: true, Path: "/"}
 
-	cookie.SetWithExpiration(w, accessTokenCookie, time.Minute * 30)
-	cookie.SetWithExpiration(w, refreshTokenCookie, time.Minute * 30)
+	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	cookie.SetWithExpiration(w, refreshTokenCookie, time.Hour * 24 * 30) // 1 month
 
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
