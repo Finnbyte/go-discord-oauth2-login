@@ -18,6 +18,9 @@
         <div>
             {{if .UserId}}
             <p>Welcome, <strong>{{.Username}}</strong>!</p> 
+            <figure class="image is-64x64">
+                <img class="is-rounded" src="https://cdn.discordapp.com/avatars/{{.UserId}}/{{.Avatar}}.png">
+            </figure>
             <form action="/api/logout">
                 <button type="submit">Logout</button>
             </form>
