@@ -10,14 +10,18 @@ import (
 )
 
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
-	maybeAccessTokenCookie := cookie.TryGetValidCookie(r, "AccessToken")
-	if maybeAccessTokenCookie == nil {
-		fmt.Println("no access token")
-		http.Redirect(w, r, "/api/login/refresh", http.StatusSeeOther)
-		return
-	}
+	var userData discordapi.DiscordIdentity
 
-	userData, _ := discordapi.GetOwnDiscordIdentity(maybeAccessTokenCookie.Value)
+	maybeAccessTokenCookie := cookie.TryGetValidCookie(r, "AccessToken")
+	_, refreshTokenNotFoundErr := r.Cookie("RefreshToken")
+	if maybeAccessTokenCookie == nil {
+		if refreshTokenNotFoundErr == nil {
+			http.Redirect(w, r, "/api/login/refresh", http.StatusSeeOther)
+			return
+		}
+	} else {
+		userData, _ = discordapi.GetOwnDiscordIdentity(maybeAccessTokenCookie.Value)
+	}
 
 	if err := templates.Get().ExecuteTemplate(w, "index.html", userData); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
