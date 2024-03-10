@@ -63,6 +63,7 @@ func HandleAPIAccessTokenRefresh(w http.ResponseWriter, r *http.Request) {
 	refreshTokenCookie, err := r.Cookie("RefreshToken")
 	if err != nil {
 		fmt.Fprintln(w, "TODO: Handle no refresh token")
+		return;
 	}
 
 	payload, _ := discordapi.RefreshAccessToken(refreshTokenCookie.Value)
