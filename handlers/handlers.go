@@ -17,7 +17,8 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := templates.RenderByFilename(w, "index.html", userData); err != nil {
+	userData, _ := discordapi.GetOwnDiscordIdentity(maybeAccessTokenCookie.Value)
+
 	if err := templates.Get().ExecuteTemplate(w, "index.html", userData); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
