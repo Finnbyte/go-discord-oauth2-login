@@ -24,7 +24,7 @@
         </div>
         {{else}}
         <a href="./api/login">
-            <button>Login</button>
+            <button class="button">Login</button>
         </a>
         {{end}}
     </div>
@@ -33,7 +33,6 @@
 var dropdown = document.querySelector('.dropdown');
 if (dropdown) {
     dropdown.addEventListener('click', event => {
-        console.log("moi")
         event.stopPropagation();
         dropdown.classList.toggle('is-active');
     });
