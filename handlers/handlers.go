@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"GoDiscordAuth/cookie"
+	"GoDiscordAuth/cookies"
 	"GoDiscordAuth/discordApi"
 	"GoDiscordAuth/templates"
 	"fmt"
@@ -12,7 +12,7 @@ import (
 func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	var userData discordapi.DiscordIdentity
 
-	maybeAccessTokenCookie := cookie.TryGetValidCookie(r, "AccessToken")
+	maybeAccessTokenCookie := cookies.TryGetValidCookie(r, "AccessToken")
 	_, refreshTokenNotFoundErr := r.Cookie("RefreshToken")
 	if maybeAccessTokenCookie == nil {
 		if refreshTokenNotFoundErr == nil {
@@ -57,8 +57,8 @@ func HandleAPILoginCallback(w http.ResponseWriter, r *http.Request) {
 	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, HttpOnly: true, Path: "/"}
 	refreshTokenCookie := http.Cookie{Name: "RefreshToken", Value: payload.RefreshToken, HttpOnly: true, Path: "/"}
 
-	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
-	cookie.SetWithExpiration(w, refreshTokenCookie, time.Hour * 24 * 30) // 1 month
+	cookies.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	cookies.SetWithExpiration(w, refreshTokenCookie, time.Hour * 24 * 30) // 1 month
 
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
@@ -73,9 +73,9 @@ func HandleAPIAccessTokenRefresh(w http.ResponseWriter, r *http.Request) {
 	payload, _ := discordapi.RefreshAccessToken(refreshTokenCookie.Value)
 
 	accessTokenCookie := http.Cookie{Name: "AccessToken", Value: payload.AccessToken, Path: "/", HttpOnly: true}
-	cookie.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
+	cookies.SetWithExpiration(w, accessTokenCookie, time.Second * time.Duration(payload.ExpiresIn))
 	// Refresh refresh token expiration
-	cookie.SetWithExpiration(w, *refreshTokenCookie, time.Hour * 24 * 30) // 1 month
+	cookies.SetWithExpiration(w, *refreshTokenCookie, time.Hour * 24 * 30) // 1 month
 
 	whereCameFromURL := r.URL.Path
 	http.Redirect(w, r, whereCameFromURL, http.StatusSeeOther)
@@ -95,8 +95,8 @@ func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
 
 	// Make both cookies invalid so new ones will be retrieved when needed
 	refreshTokenCookie, _ := r.Cookie("RefreshToken")
-	cookie.Clear(w, accessTokenCookie)
-	cookie.Clear(w, refreshTokenCookie)
+	cookies.Clear(w, accessTokenCookie)
+	cookies.Clear(w, refreshTokenCookie)
 	
 	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }
