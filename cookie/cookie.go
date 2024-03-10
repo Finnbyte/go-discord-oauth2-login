@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func IsUnexpired(cookie *http.Cookie) bool {
-	if cookie.Expires.After(time.Now()) {
+func IsExpired(cookie *http.Cookie) bool {
+	if !cookie.Expires.After(time.Now()) {
 		return false
 	}
 
@@ -19,7 +19,7 @@ func TryGetValidCookie(r *http.Request, name string) (*http.Cookie) {
 		return nil
 	}
 
-	if !IsUnexpired(cookie) {
+	if IsExpired(cookie) {
 		return nil
 	}
 
