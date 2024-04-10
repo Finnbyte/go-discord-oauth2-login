@@ -97,7 +97,10 @@ func HandleAPILogout(w http.ResponseWriter, r *http.Request) {
 	refreshTokenCookie, _ := r.Cookie("RefreshToken")
 	cookies.Clear(w, accessTokenCookie)
 	cookies.Clear(w, refreshTokenCookie)
-	
+
+	// Fixes this handler getting cached so logout doesn't work after first success
+	w.Header().Add("Expires", "0")
+
 	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
 }
 
